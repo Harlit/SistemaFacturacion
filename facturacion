@@ -1,0 +1,120 @@
+import datetime
+
+class Empleado:
+    def __init__(self, nombre, apellido, cargo):
+        self.nombre = nombre
+        self.apellido = apellido
+        self.cargo = cargo
+
+class Producto:
+    def __init__(self, nombre, precio, cantidad):
+        self.nombre = nombre
+        self.precio = precio
+        self.cantidad = cantidad
+
+class Factura:
+    def __init__(self, empleado):
+        self.empleado = empleado
+        self.productos = []
+        self.total = 0
+        self.fecha = datetime.datetime.now()
+        self.monto_pagado = 0
+
+    def agregar_producto(self, producto):
+        self.productos.append(producto)
+        self.total += producto.precio
+
+    def imprimir_factura(self):
+        print(f"Factura emitida por {self.empleado.nombre} {self.empleado.apellido} ({self.empleado.cargo}):")
+        for producto in self.productos:
+            print(f"{producto.nombre} - ${producto.precio}")
+        print(f"Total: ${self.total}")
+        print(f"Fecha de emisión: {self.fecha}")
+        print(f"Monto pagado: ${self.monto_pagado}")
+        if self.monto_pagado >= self.total:
+            cambio = self.monto_pagado - self.total
+            print(f"Cambio: ${cambio}")
+
+class Inventario:
+    def __init__(self):
+        self.productos = []
+
+    def agregar_producto(self, producto):
+        self.productos.append(producto)
+
+    def buscar_producto(self, nombre):
+        for producto in self.productos:
+            if producto.nombre == nombre:
+                return producto
+        return None
+
+    def actualizar_inventario(self, nombre, cantidad):
+        producto = self.buscar_producto(nombre)
+        if producto:
+            producto.cantidad += cantidad
+        else:
+            print("Producto no encontrado.")
+
+empleados = []
+inventario = Inventario()
+factura = Factura(None)
+
+while True:
+    print("1. Registrar empleado")
+    print("2. Registrar producto")
+    print("3. Facturación")
+    print("4. Control de inventario")
+    print("5. Imprimir factura")
+    print("6. Salir")
+    opcion = input("Ingrese una opción: ")
+
+    if opcion == "1":
+        nombre = input("Ingrese el nombre del empleado: ")
+        apellido = input("Ingrese el apellido del empleado: ")
+        cargo = input("Ingrese el cargo del empleado: ")
+        empleado = Empleado(nombre, apellido, cargo)
+        factura.empleado = empleado
+        print("Empleado registrado exitosamente.")
+
+    elif opcion == "2":
+        nombre = input("Ingrese el nombre del producto: ")
+        precio = float(input("Ingrese el precio del producto: "))
+        cantidad = int(input("Ingrese la cantidad del producto: "))
+        producto = Producto(nombre, precio, cantidad)
+        inventario.agregar_producto(producto)
+        print("Producto registrado exitosamente.")
+
+    elif opcion == "3":
+        nombre = input("Ingrese el nombre del producto: ")
+        cantidad = int(input("Ingrese la cantidad del producto: "))
+        producto = inventario.buscar_producto(nombre)
+        if producto and producto.cantidad >= cantidad:
+            factura.agregar_producto(producto)
+            inventario.actualizar_inventario(nombre, -cantidad)
+            print("Producto agregado a la factura.")
+            monto_pagado = float(input("Ingrese el monto pagado por el cliente: "))
+            factura.monto_pagado = monto_pagado
+            if monto_pagado >= factura.total:
+                cambio = monto_pagado - factura.total
+                print(f"Cambio: ${cambio}")
+            else:
+                print("Monto insuficiente.")
+        else:
+            print("Producto no encontrado o cantidad insuficiente.")
+
+    elif opcion == "4":
+        print("Inventario:")
+        for producto in inventario.productos:
+            print(f"{producto.nombre} - {producto.cantidad}")
+
+    elif opcion == "5":
+        if factura.productos:
+            factura.imprimir_factura()
+        else:
+            print("No hay productos en la factura.")
+
+    elif opcion == "6":
+        break
+
+    else:
+        print("Opción inválida.")
